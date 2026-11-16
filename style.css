@@ -1,0 +1,250 @@
+/* ==========================================================
+   style.css: shared styles for every page
+   3CG - Carnegie Cyber Consulting Group
+
+   Brand colors live in :root. Change them here and the whole site follows.
+   Building your page? See components.html for ready-made pieces.
+   ========================================================== */
+
+:root {
+  /* Carnegie Mellon brand colors */
+  --cmu-red: #C41230;        /* Carnegie Red */
+  --cmu-red-dark: #8F0E24;
+  --cmu-black: #000000;
+  --iron-gray: #6D6E71;
+  --steel-gray: #E0E0E0;
+  --scots-rose: #EF3A47;
+  --gold-thread: #FDB515;
+  --green-thread: #009647;
+  --teal-thread: #008F91;
+  --blue-thread: #043673;
+
+  /* Site colors */
+  --ink: #1d1d1f;            /* headings */
+  --text: #333336;           /* body text */
+  --muted: #6D6E71;          /* secondary text */
+  --paper: #f7f6f4;          /* page background */
+  --card: #ffffff;
+  --line: #e0dedb;
+  --link: #A50F28;
+
+  /* Risk tiers (match the Tiers tab in the Google Sheet) */
+  --tier-high: #D9534F;
+  --tier-medium: #F0AD4E;
+  --tier-low: #5CB85C;
+
+  /* Evidence levels */
+  --ev-verified: #00773a;
+  --ev-partly: #4f7f2a;
+  --ev-claimed: #a86b00;
+  --ev-assumed: #7a6457;
+  --ev-unknown: #9b2c2c;
+
+  --radius: 8px;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 14px rgba(0,0,0,.05);
+  --font: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --max: 1100px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f2f2f3; --text: #d6d6d9; --muted: #a3a4a8;
+    --paper: #141416; --card: #1d1d20; --line: #313136;
+    --link: #ff6b7d;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--paper); color: var(--text); font: 16px/1.6 var(--font); }
+a { color: var(--link); }
+img { max-width: 100%; }
+code { font-family: var(--mono); font-size: .9em; }
+h1, h2, h3, h4 { color: var(--ink); line-height: 1.2; margin: 0 0 .45em; }
+h1 { font-family: var(--serif); font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 600; letter-spacing: -.01em; }
+h2 { font-family: var(--serif); font-size: 1.55rem; font-weight: 600; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+h4 { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+p { margin: 0 0 1em; }
+.container { max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.mono { font-family: var(--mono); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Tartan ----------
+   A simple plaid in CMU colors. Use class="tartan" on any block. */
+.tartan {
+  background-color: var(--cmu-red);
+  background-image:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.55) 0 7px, transparent 7px 16px,
+      rgba(255,255,255,.28) 16px 18px, transparent 18px 30px),
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,.55) 0 7px, transparent 7px 16px,
+      rgba(255,255,255,.28) 16px 18px, transparent 18px 30px);
+}
+.tartan-band { height: 10px; }
+.tartan-band.thin { height: 5px; }
+
+main { width: 100%; padding-bottom: 40px; }
+
+/* ---------- Header ---------- */
+.site-header { background: var(--cmu-red); color: #fff; }
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px 24px; padding-top: 12px; padding-bottom: 12px;
+}
+.brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; }
+.brand img { width: 34px; height: auto; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-short { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; letter-spacing: .02em; }
+.brand-long { font-size: .78rem; letter-spacing: .04em; opacity: .9; }
+
+.site-nav { display: flex; flex-wrap: wrap; gap: 2px; }
+.site-nav a {
+  color: rgba(255,255,255,.88); text-decoration: none; font-size: .9rem; font-weight: 600;
+  padding: 7px 11px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;
+}
+.site-nav a:hover { color: #fff; background: rgba(0,0,0,.18); }
+.site-nav a[aria-current="page"] { color: #fff; background: rgba(0,0,0,.28); }
+.nav-soon {
+  font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  background: rgba(255,255,255,.2); padding: 1px 6px; border-radius: 999px;
+}
+
+/* ---------- Page intro ---------- */
+.page-intro { padding: 44px 0 24px; }
+.eyebrow {
+  font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--cmu-red); margin-bottom: .7em;
+}
+@media (prefers-color-scheme: dark) { .eyebrow { color: var(--scots-rose); } }
+.lede { font-size: 1.1rem; max-width: 64ch; }
+section { padding: 16px 0 32px; }
+
+/* ---------- Layout helpers ---------- */
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.stack > * + * { margin-top: 16px; }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.card > :last-child { margin-bottom: 0; }
+a.card { display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: border-color .15s, transform .15s; }
+a.card:hover { border-color: var(--cmu-red); transform: translateY(-2px); }
+.card-accent { border-top: 4px solid var(--cmu-red); }
+.card .card-foot { margin-top: auto; padding-top: 12px; font-weight: 700; color: var(--link); }
+
+/* ---------- Contribution slots ----------
+   Dashed boxes that mark where each teammate builds. Delete the
+   .slot-head once your section is finished. */
+.slot {
+  border: 2px dashed var(--line); border-radius: var(--radius);
+  padding: 20px; background: color-mix(in srgb, var(--card) 60%, transparent);
+}
+.slot.done { border-style: solid; background: var(--card); }
+.slot-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.slot-owner { font-size: .85rem; color: var(--muted); }
+.slot-owner strong { color: var(--ink); }
+
+/* ---------- Status and badges ---------- */
+.badge {
+  display: inline-block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  padding: 3px 9px; border-radius: 999px; background: var(--steel-gray); color: #333;
+}
+.status-todo { background: var(--steel-gray); color: #444; }
+.status-progress { background: #fff1cc; color: #7a5200; }
+.status-ready { background: #d6f0df; color: #0b5d2e; }
+.tier-high { background: var(--tier-high); color: #fff; }
+.tier-medium { background: var(--tier-medium); color: #3b2600; }
+.tier-low { background: var(--tier-low); color: #fff; }
+
+.evidence {
+  display: inline-block; font-size: .76rem; font-weight: 700; white-space: nowrap;
+  padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor;
+}
+.ev-verified { color: var(--ev-verified); }
+.ev-partly-verified { color: var(--ev-partly); }
+.ev-claimed { color: var(--ev-claimed); }
+.ev-assumed { color: var(--ev-assumed); border-style: dashed; }
+.ev-unknown { color: var(--ev-unknown); border-style: dashed; }
+
+/* ---------- Big numbers ---------- */
+.stat { display: flex; flex-direction: column; }
+.stat-value { font-family: var(--mono); font-size: 2rem; font-weight: 600; color: var(--ink); line-height: 1.1; }
+.stat-label { font-size: .85rem; color: var(--muted); }
+
+/* ---------- Callouts ---------- */
+.callout {
+  background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--cmu-red);
+  border-radius: var(--radius); padding: 14px 18px; margin: 0 0 20px;
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout-info { border-left-color: var(--blue-thread); }
+.callout-warn { border-left-color: var(--gold-thread); }
+details.callout summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+details.callout[open] summary { margin-bottom: 10px; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-weight: 700; font-size: .92rem;
+  padding: 9px 16px; border-radius: 6px; border: 1.5px solid var(--cmu-red);
+  background: var(--cmu-red); color: #fff; cursor: pointer; text-decoration: none;
+}
+.btn:hover { background: var(--cmu-red-dark); border-color: var(--cmu-red-dark); }
+.btn-outline { background: transparent; color: var(--link); }
+.btn-outline:hover { background: color-mix(in srgb, var(--cmu-red) 10%, transparent); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* ---------- Forms (for calculators and filters) ---------- */
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.field label { font-weight: 700; font-size: .9rem; color: var(--ink); }
+.field .hint { font-size: .8rem; color: var(--muted); }
+input[type="text"], input[type="number"], select, textarea {
+  font: inherit; color: var(--text); background: var(--card);
+  border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%;
+}
+input:focus, select:focus, textarea:focus, .btn:focus-visible, a:focus-visible {
+  outline: 2px solid var(--cmu-red); outline-offset: 2px;
+}
+input[type="range"] { width: 100%; accent-color: var(--cmu-red); }
+
+/* ---------- Tables ---------- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+thead th { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+tbody th { color: var(--ink); font-weight: 700; }
+td.num, th.num { font-family: var(--mono); text-align: right; }
+td a { white-space: nowrap; }
+
+/* ---------- Data connection box ---------- */
+.data-check { font-family: var(--mono); font-size: .82rem; color: var(--muted); }
+.data-check li { margin: 2px 0; }
+.data-check .ok { color: var(--ev-verified); }
+.data-check .fail { color: var(--ev-unknown); }
+
+/* ---------- Footer ---------- */
+.site-footer { margin-top: auto; padding-top: 0; background: #1d1d1f; color: #c8c8cc; font-size: .85rem; }
+.footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-top: 22px; padding-bottom: 28px; }
+.site-footer a { color: #fff; }
+#data-source { font-family: var(--mono); font-size: .8rem; }
+#data-source:empty { display: none; }
+#data-source::before { content: "●"; margin-right: 6px; }
+#data-source[data-state="live"]::before { color: #3ddc84; }
+#data-source[data-state="sample"]::before,
+#data-source[data-state="mixed"]::before { color: var(--gold-thread); }
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .page-intro { padding: 30px 0 14px; }
+  .brand-long { font-size: .72rem; }
+  .site-nav a { padding: 6px 8px; font-size: .85rem; }
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAIR Calculator · 3CG</title>
+  <link rel="icon" href="assets/3cg-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Open+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="page-intro">
+      <p class="eyebrow">Tool 3 · Cost in dollars</p>
+      <h1>FAIR Cost Calculator</h1>
+      <p class="lede">What the top risks could cost PRT, estimated with the FAIR method: how often a loss could happen times how much each one would cost.</p>
+    </div>
+
+    <section>
+      <!-- ===== FAIR CALCULATOR: BUILD INSIDE THIS SECTION ===== -->
+      <div class="slot">
+        <div class="slot-head">
+          <span class="slot-owner">Owner: <strong>[Name]</strong> · FAIR Calculator</span>
+          <span class="badge status-todo">Not started</span>
+        </div>
+        <p class="muted small">Add a FAIR tab to the Google Sheet when ready, then link it in js/data.js. Build in js/fair.js.</p>
+        <div id="fair-app"></div>
+        <div id="fair-app-data" class="callout callout-info"></div>
+      </div>
+      <!-- ===== END FAIR CALCULATOR ===== -->
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="js/data.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/fair.js"></script>
+</body>
+</html>

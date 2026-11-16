@@ -1,0 +1,14 @@
+risk_id,risk_name,cia_category,related_vendor_id,vendor_tier,likelihood,impact,adjusted_likelihood,risk_score,notes
+R1,Ransomware at the fare vendor (main scenario),Availability,masabi,High,3,5,4,20,EXAMPLE ROW: likelihood and impact are placeholders for the heat map teammate to replace.
+R2,PRT locked out of the vendor's system,Availability,masabi,High,,,,,
+R3,"Outage that isn't an attack (failed update, cloud outage)",Availability,masabi,High,,,,,
+R4,Repeat of the 2024 attack on PRT's own network,Availability,,,,,,,
+R5,"Theft of rider data (travel history, eligibility records)",Confidentiality,masabi,High,,,,,
+R6,Scam emails and texts pretending to be PRT during the switch,Confidentiality,,,,,,,
+R7,Old ConnectCard data left behind after retirement,Confidentiality,,,,,,,
+R8,Misuse of rider travel data,Confidentiality,masabi,High,,,,,
+R9,Rider accounts taken over with stolen passwords,Integrity,masabi,High,,,,,
+R10,Balances or reduced-fare eligibility altered,Integrity,masabi,High,,,,,
+R11,Fake mobile tickets,Integrity,masabi,High,,,,,
+R12,Fleet-wide changes pushed through the router management platform,Integrity,digi,High,,,,,
+R13,Card data stolen at ticket machines or the processor,Confidentiality,processor,High,,,,,

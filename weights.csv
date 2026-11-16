@@ -1,0 +1,7 @@
+criterion_key,criterion,weight,score_1_means,score_3_means,score_5_means
+data_sensitivity,Data sensitivity,0.2,No personal or payment data,"Payment data in transit, or limited personal data","Rider accounts, payment data, travel history, or eligibility records"
+criticality,How critical to fare collection,0.2,Failure has little effect on fares,Failure disables one payment channel,Failure stops most fare collection or billing
+system_access,Access to PRT systems,0.15,No connection to PRT systems,Devices on PRT's network or vehicles,Admin or remote control over many PRT devices or systems
+security_evidence,Security evidence,0.2,"Current certifications, publicly verified",Older or partly verified certifications,"Only claims, or nothing found"
+contract_protections,Contract protections,0.1,"Known breach notice, recovery time, and audit rights",Some terms known,No terms public
+concentration,Concentration risk,0.15,Serves few customers; an attack hits PRT alone,Shared back office across some customers,One platform serving many agencies

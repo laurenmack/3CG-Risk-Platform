@@ -1,0 +1,31 @@
+vendor_id,criterion_key,score,reason,evidence_level,source_url
+masabi,data_sensitivity,5,"Rider accounts store balances, passes, and fare benefits, plus payment and travel data",Verified,https://www.rideprt.org/
+masabi,criticality,5,Runs account-based fares and validators across the network; university riders now ride through the app,Verified,https://masabi.com/?p=27334
+masabi,system_access,4,"Operates validators on PRT vehicles and the back office, though not PRT's own office network",Verified,https://masabi.com/?p=27334
+masabi,security_evidence,3,"Says it maintains PCI DSS, ISO 27001, SOC 2, and Cyber Essentials (job postings, not certificates)",Claimed,https://www.workingnomads.com/jobs/head-of-security-compliance-masabi-1662439
+masabi,contract_protections,4,Agreement approved March 2025 and renewed late 2025; security terms not public,Unknown,https://www.rideprt.org/link/972f61c2dabd42e783eb31496d13b985.aspx
+masabi,concentration,5,Justride platform used in more than 250 locations,Claimed,https://www.workingnomads.com/jobs/security-compliance-analyst-masabi
+processor,data_sensitivity,5,Handles card numbers for every card payment,Assumed,
+processor,criticality,4,Card payments in the app and at machines depend on it,Assumed,
+processor,system_access,2,Usually connected through the fare vendors rather than PRT directly,Assumed,
+processor,security_evidence,4,"Processors are normally PCI-certified, but PRT's processor is not identified",Unknown,
+processor,contract_protections,4,No contract found,Unknown,
+processor,concentration,4,Processors serve many merchants at once,Assumed,
+digi,data_sensitivity,2,Carries fare traffic but is not known to store rider data,Verified,https://www.digi.com/resources/customer-stories/pittsburgh-improves-public-transit-ridership
+digi,criticality,4,Connects Masabi's fare devices on buses so riders can scan phones,Verified,https://www.digi.com/resources/customer-stories/pittsburgh-improves-public-transit-ridership
+digi,system_access,5,Remote management platform updates firmware on routers and fareboxes fleet-wide,Verified,https://www.digi.com/resources/customer-stories/pittsburgh-improves-public-transit-ridership
+digi,security_evidence,4,No certifications found in our research,Unknown,
+digi,contract_protections,4,No contract found,Unknown,
+digi,concentration,4,Cloud management platform serves many transit agencies,Claimed,https://www.digi.com/resources/customer-stories/pittsburgh-improves-public-transit-ridership
+flowbird,data_sensitivity,3,Takes card payments and reloads rider accounts at 80+ machines,Verified,https://www.flowbird.com/pittsburgh-regional-transit-partners-with-flowbird-for-fare-payment-solution/
+flowbird,criticality,3,One payment channel among several; matters most to cash riders,Verified,https://www.wpxi.com/news/local/pittsburgh-regional-transit-install-high-tech-ticket-vending-machines/FC5YRAHQQZB4BOPMBWZQT5SEOQ/
+flowbird,system_access,3,Networked machines in PRT stations,Assumed,
+flowbird,security_evidence,2,Publishes a PCI DSS v4.0.1 attestation and a Dec. 2024 assessor certificate; scope for PRT's machines to confirm,Verified,https://us.support.flowbird.group/hc/en-us/article_attachments/36454664626195
+flowbird,contract_protections,4,Security terms not public,Unknown,
+flowbird,concentration,3,Large global vendor with shared back-office platforms,Claimed,
+sb,data_sensitivity,2,"Mainly cash, about $4 million a year",Verified,https://www.unionprogress.com/2025/10/05/new-bus-fare-boxes-for-small-group-that-uses-cash-will-cost-pittsburgh-regional-transit-about-20-million/
+sb,criticality,3,Cash is the fallback during an app outage and serves riders without bank accounts,Verified,
+sb,system_access,3,"A device on every bus, tied into the fare system",Verified,
+sb,security_evidence,3,PCI-certified data centers under an older version; point-to-point encryption added in 2023,Partly verified,https://www.petrolplaza.com/news/6874
+sb,contract_protections,4,Contract of up to $20 million; security terms not public,Unknown,https://www.unionprogress.com/2025/10/05/new-bus-fare-boxes-for-small-group-that-uses-cash-will-cost-pittsburgh-regional-transit-about-20-million/
+sb,concentration,3,Large vendor that hosts back offices for many agencies,Claimed,

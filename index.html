@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3CG - Carnegie Cyber Consulting Group</title>
+  <link rel="icon" href="assets/3cg-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Open+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="page-intro">
+      <p class="eyebrow">Cyber risk appraisal · Pittsburgh Regional Transit</p>
+      <h1>Risk tools for PRT's switch to ReadyFare</h1>
+      <p class="lede">PRT is moving fare collection from ConnectCard to ReadyFare, a system run by outside vendors. These tools show which vendors carry the most risk, which risks matter most, and what an attack could cost.</p>
+    </div>
+
+    <section aria-labelledby="tools-h">
+      <h2 id="tools-h">The tools</h2>
+      <div class="grid">
+        <a class="card card-accent" href="scorecard.html">
+          <h4>Tool 1</h4>
+          <h3>Vendor Scorecard</h3>
+          <p>Rates each fare system vendor on six criteria and sorts them into High, Medium, and Low risk tiers.</p>
+          <p class="small muted">Owner: [Name] · <span class="badge status-progress">In progress</span></p>
+          <span class="card-foot">Open →</span>
+        </a>
+        <a class="card card-accent" href="heatmap.html">
+          <h4>Tool 2</h4>
+          <h3>Risk Heat Map</h3>
+          <p>Places each risk by likelihood and impact, grouped by availability, confidentiality, and integrity.</p>
+          <p class="small muted">Owner: [Name] · <span class="badge status-todo">Not started</span></p>
+          <span class="card-foot">Open →</span>
+        </a>
+        <a class="card card-accent" href="fair.html">
+          <h4>Tool 3</h4>
+          <h3>FAIR Cost Calculator</h3>
+          <p>Estimates what the top risks could cost PRT in dollars, using the FAIR method.</p>
+          <p class="small muted">Owner: [Name] · <span class="badge status-todo">Not started</span></p>
+          <span class="card-foot">Open →</span>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="flow-h">
+      <h2 id="flow-h">How they work together</h2>
+      <div class="grid">
+        <div class="card"><h4>Step 1</h4><h3>Score the vendors</h3><p>A High-tier vendor makes its risks more likely.</p></div>
+        <div class="card"><h4>Step 2</h4><h3>Map the risks</h3><p>The heat map raises those risks and shows the worst ones.</p></div>
+        <div class="card"><h4>Step 3</h4><h3>Price the top risks</h3><p>FAIR puts a dollar range on them.</p></div>
+        <div class="card"><h4>Step 4</h4><h3>Fix and rescore</h3><p>Contract and security fixes lower the scores over time.</p></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="team-h">
+      <h2 id="team-h">The team</h2>
+      <!-- Replace [Name] with each person's name and role. -->
+      <div class="grid">
+        <div class="card"><h3>[Name]</h3><p class="muted">Vendor Scorecard · Website</p></div>
+        <div class="card"><h3>[Name]</h3><p class="muted">Risk Heat Map</p></div>
+        <div class="card"><h3>[Name]</h3><p class="muted">FAIR Cost Calculator</p></div>
+        <div class="card"><h3>[Name]</h3><p class="muted">[Role]</p></div>
+      </div>
+    </section>
+
+    <div class="callout callout-warn">
+      <p><strong>About this site.</strong> A class project built from public information. Scores and costs are 3CG estimates,
+      not PRT's figures. A real deployment would keep vendor ratings private and put this site behind a login.</p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="js/data.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

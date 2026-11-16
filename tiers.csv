@@ -1,0 +1,4 @@
+tier,min_score,color_hex,recommended_action
+High,3.5,#D9534F,"Require 24-hour breach notice, a guaranteed maximum recovery time, PRT's right to audit, and multi-factor login for admin access. Request current SOC 2, PCI, or ISO 27001 evidence yearly. Include in twice-yearly tabletop exercises."
+Medium,2.5,#F0AD4E,"Require 72-hour breach notice, confirm certifications cover PRT's systems, and review yearly."
+Low,0,#5CB85C,Standard contract terms; review every two years.

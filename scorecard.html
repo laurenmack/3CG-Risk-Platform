@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Open+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scorecard.css">
 </head>
 <body>
   <div id="site-header"></div>
@@ -21,17 +22,35 @@
     </div>
 
     <section>
-      <!-- ===== VENDOR SCORECARD: BUILD INSIDE THIS SECTION ===== -->
-      <div class="slot">
+      <!-- ===== VENDOR SCORECARD ===== -->
+      <div class="slot done">
         <div class="slot-head">
           <span class="slot-owner">Owner: <strong>[Name]</strong> · Vendor Scorecard</span>
           <span class="badge status-progress">In progress</span>
         </div>
-        <p class="muted small">Reads the Vendors, Score_Reasons, Weights and Tiers tabs. Build in js/scorecard.js.</p>
-        <div id="scorecard-app"></div>
-        <div id="scorecard-app-data" class="callout callout-info"></div>
+
+        <details class="callout">
+          <summary>How to read this scorecard</summary>
+          <ul>
+            <li>Each vendor is scored on six criteria, such as how sensitive its data is and how much fare collection depends on it.</li>
+            <li>The scores are weighted and combined into one number. Click a tier below to show only those vendors.</li>
+            <li>Missing information counts against a vendor. If we couldn't find proof of security, we scored it as risky until the vendor shows otherwise.</li>
+            <li>Click <em>See why</em> on any vendor for the reason, evidence, and source behind each score.</li>
+          </ul>
+        </details>
+
+        <div id="scorecard-app" aria-live="polite">
+          <p class="muted">Loading vendors…</p>
+        </div>
       </div>
       <!-- ===== END VENDOR SCORECARD ===== -->
+    </section>
+
+    <section aria-labelledby="method-h">
+      <h2 id="method-h">How we score</h2>
+      <p class="muted">Criteria and weights follow NIST SP 800-161 Rev. 1, CISA's Secure by Demand guide, and APTA's transit cybersecurity practice.
+        Weights are 3CG judgments and can be changed on the Weights tab of the Google Sheet.</p>
+      <div id="scorecard-method" class="card table-wrap"></div>
     </section>
   </main>
 

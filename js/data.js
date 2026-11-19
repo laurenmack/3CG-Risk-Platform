@@ -18,7 +18,11 @@ const SHEET_URLS = {
   weights:      "",
   tiers:        "",
   risks:        "",
-  fair:         ""   // FAIR teammate: add your tab's link here when it exists
+  fair: "",
+  fairParameters: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=849211233&single=true&output=csv", 
+  fairScenarios: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=1793792482&single=true&output=csv", 
+  fairControls: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=1111731554&single=true&output=csv",
+  fairSources: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=829671258&single=true&output=csv" 
 };
 
 /* Sample copies used when a link above is blank or unreachable.
@@ -29,7 +33,11 @@ const LOCAL_FILES = {
   weights:      "data/weights.csv",
   tiers:        "data/tiers.csv",
   risks:        "data/risks.csv",
-  fair:         ""
+  fair:         "",
+  fairParameters: "", 
+  fairScenarios: "", 
+  fairControls: "",
+  fairSources: ""
 };
 
 const DATA_STATUS = { live: 0, sample: 0 };

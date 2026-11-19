@@ -1,0 +1,20 @@
+/* CSS for FAIR calculator page. */
+.fair-controls { display:grid;grid-template-columns: repeat(auto-fit,minmax(210px,1fr));gap:16px; }
+.fair-controls .field { margin:0; }
+.fair-stat-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0;}
+.fair-stat-grid .card {padding:16px;}
+.fair-stat-grid .stat-value {font-size:clamp(1.22rem,2.8vw,1.9rem);overflow-wrap:anywhere;}
+.fair-panel {margin:18px 0;}
+.fair-panel h2 {margin-bottom:12px;}
+.fair-actions {display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0;}
+.fair-note {font-size:.82rem;color:var(--muted);}
+.fair-chart-container {min-height:280px;position:relative;}
+.fair-chart-container canvas {width:100%;max-height:320px;}
+.fair-inline-tag {font-size:.72rem;padding:2px 6px;background:var(--paper);border:1px solid var(--line);border-radius:4px;}
+.fair-risk-flag {border-left:4px solid var(--gold-thread);padding:10px 14px;background:var(--paper);margin-top:15px;}
+.fair-sources {padding-left:18px;overflow-wrap:anywhere;}
+.fair-sources li {margin:6px 0;}
+.fair-data-quality {border-collapse:collapse;width:100%;}
+.fair-kpi-good {color:var(--ev-verified);}
+.fair-kpi-bad {color:var(--ev-unknown);}
+@media (max-width:700px){.fair-stat-grid {grid-template-columns:repeat(2,minmax(0,1fr));}.fair-stat-grid .card {padding:12px;}}

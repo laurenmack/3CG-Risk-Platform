@@ -3,7 +3,7 @@
 .fair-controls .field { margin:0; }
 .fair-stat-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0;}
 .fair-stat-grid .card {padding:16px;}
-.fair-stat-grid .stat-value {font-size:clamp(1.22rem,2.8vw,1.9rem);overflow-wrap:anywhere;}
+.fair-stat-grid .stat-value {font-size: 1.4rem;font-weight: 700;line-height: 1.2;overflow-wrap:anywhere;}
 .fair-panel {margin:18px 0;}
 .fair-panel h2 {margin-bottom:12px;}
 .fair-actions {display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0;}

@@ -1,0 +1,119 @@
+/* ==========================================================
+   heatmap.css: styles used only on the Risk Heat Map page
+   Builds on the colors and fonts in style.css.
+   ========================================================== */
+
+/* Score bands: one hue (Carnegie red) that gets stronger as the score rises:
+   pale to deep red on light pages, dull to vivid red on dark pages.
+   Each band has a matching text color for the small score in the corner. */
+:root {
+  --hm-low: #EE9AA5;      --hm-low-text: #1d1d1f;
+  --hm-moderate: #DD5A6C; --hm-moderate-text: #2a0509;
+  --hm-high: #C41230;     --hm-high-text: #ffffff;
+  --hm-critical: #7E0A1D; --hm-critical-text: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --hm-low: #73424C;      --hm-low-text: #ffffff;
+    --hm-moderate: #A8364C; --hm-moderate-text: #ffffff;
+    --hm-high: #D42D46;     --hm-high-text: #ffffff;
+    --hm-critical: #FF5C70; --hm-critical-text: #1d1d20;
+  }
+}
+.band-low      { --band: var(--hm-low);      --band-text: var(--hm-low-text); }
+.band-moderate { --band: var(--hm-moderate); --band-text: var(--hm-moderate-text); }
+.band-high     { --band: var(--hm-high);     --band-text: var(--hm-high-text); }
+.band-critical { --band: var(--hm-critical); --band-text: var(--hm-critical-text); }
+
+/* ---------- Status and counts ---------- */
+.hm-status { margin-bottom: 12px; }
+.hm-counts { font-size: .92rem; margin-bottom: 16px; }
+
+/* ---------- Layout: map beside details; stacked on small screens ---------- */
+.hm-layout {
+  display: grid; gap: 24px; align-items: start;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
+}
+
+/* ---------- Matrix ---------- */
+.hm-plot {
+  display: grid; grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "ytitle grid" ". xtitle";
+  column-gap: 6px;
+}
+.hm-y-title, .hm-x-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.hm-y-title { grid-area: ytitle; writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; }
+.hm-x-title { grid-area: xtitle; text-align: center; margin-top: 4px; }
+
+.hm-grid {
+  grid-area: grid;
+  display: grid; gap: 2px;
+  grid-template-columns: 1.6rem repeat(5, minmax(0, 1fr));
+}
+.hm-tick { font-family: var(--mono); font-size: .85rem; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+.hm-tick-x { padding-top: 4px; }
+.hm-tick-extra { font-style: italic; }
+
+.hm-cell {
+  position: relative; min-height: 76px; padding: 20px 4px 6px;
+  background: var(--band); border-radius: 4px;
+  display: flex; align-items: flex-start; justify-content: center;
+}
+.hm-cell-score {
+  position: absolute; top: 3px; left: 6px;
+  font-family: var(--mono); font-size: .7rem; font-weight: 600; color: var(--band-text); opacity: .85;
+}
+.hm-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+
+.hm-chip {
+  font: 600 .82rem/1 var(--mono); cursor: pointer;
+  min-width: 2.6em; min-height: 28px; padding: 5px 8px;
+  color: var(--ink); background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
+}
+.hm-chip:hover { border-color: var(--ink); }
+.hm-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.hm-chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+
+/* ---------- Legend ---------- */
+.hm-legend { margin-top: 14px; }
+.hm-legend-title { display: block; font-size: .85rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.hm-legend-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .88rem; }
+.hm-legend-list li { display: inline-flex; align-items: center; gap: 6px; }
+.hm-legend .small { margin: 0; }
+.hm-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; background: var(--band); flex-shrink: 0; }
+
+/* ---------- Detail panel ---------- */
+.hm-detail { position: sticky; top: 16px; }
+.hm-detail:focus { outline: none; }
+.hm-detail-empty { margin: 0; }
+.hm-detail-id { font-family: var(--mono); margin-bottom: .4em; }
+.hm-facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 14px 0 18px; font-size: .92rem; }
+.hm-facts dt { color: var(--muted); }
+.hm-facts dd { margin: 0; color: var(--ink); }
+.hm-final { font-weight: 600; }
+.hm-band-tag { display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; font-size: .85rem; }
+.hm-notes { margin: 0; }
+
+/* ---------- Awaiting scores ---------- */
+.hm-awaiting { padding: 28px 0 0; }
+.hm-awaiting h3 { display: flex; align-items: center; gap: 8px; }
+.hm-awaiting-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.hm-awaiting-list li { display: flex; gap: 12px; align-items: flex-start; }
+.hm-awaiting-text { display: flex; flex-direction: column; }
+
+/* ---------- Smaller screens ---------- */
+@media (max-width: 860px) {
+  .hm-layout { grid-template-columns: minmax(0, 1fr); }
+  .hm-detail { position: static; scroll-margin-top: 12px; }
+}
+@media (max-width: 640px) {
+  .hm-grid { grid-template-columns: 1.1rem repeat(5, minmax(0, 1fr)); }
+  .hm-cell { min-height: 58px; padding: 18px 2px 4px; }
+  .hm-cell-score { left: 4px; font-size: .65rem; }
+  .hm-chips { flex-direction: column; align-items: center; gap: 3px; }
+  .hm-chip { font-size: .74rem; min-width: 0; min-height: 26px; padding: 4px 5px; }
+  .hm-facts { grid-template-columns: 1fr; gap: 0; }
+  .hm-facts dd { margin-bottom: 8px; }
+}

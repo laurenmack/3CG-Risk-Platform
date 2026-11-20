@@ -2,17 +2,22 @@
    heatmap.js: Risk Heat Map page
    Owner: Yihao Ma
 
-   Reads data/risks.csv from this repository with loadTable("risks")
-   (see REPO_FILES in data.js). Each risk is placed by impact (left
-   to right) and adjusted likelihood (bottom to top). Adjusted
-   likelihood and risk score are taken from the CSV as written; this
-   page does not recalculate them (the README explains how to keep
-   them consistent). Rows with blank or invalid scores are listed
-   under "Awaiting scores" instead of being plotted.
+   Reads the Risks tab of the team's Google Sheet with loadTable("risks")
+   (link in data.js) every time the page opens or is refreshed. If the
+   sheet can't be reached, it uses the reviewed copy in data/risks.csv.
+   Each risk is placed by impact (left to right) and adjusted likelihood
+   (bottom to top). Adjusted likelihood and risk score come straight from
+   the sheet's formula columns; this page does not recalculate them.
+   Rows with blank or invalid scores are listed under "Awaiting scores"
+   instead of being plotted.
    ========================================================== */
 
 (async function () {
   const app = document.getElementById("heatmap-app");
+
+  /* Date of the reviewed ratings saved in data/risks.csv (the backup copy).
+     Update it whenever you replace that file. */
+  const BACKUP_DATE = "20 November 2026";
 
   /* Base likelihood and impact are rated 1 to 5. Adjusted likelihood adds 1
      for High-tier vendors with no cap, so it can reach 6 (a base of 5 at a
@@ -30,13 +35,22 @@
   const bandFor = score => BANDS.find(b => score >= b.min) || BANDS[BANDS.length - 1];
 
   /* ---------- Load ---------- */
-  let rows, vendors;
+  let rows, vendors, isLive;
   try {
     [rows, vendors] = await Promise.all([
       loadTable("risks"),
       loadTable("vendors").catch(() => []) // only used for vendor display names
     ]);
-    if (!rows.some(r => "risk_id" in r)) throw new Error('The risk file has no "risk_id" column.');
+    isLive = DATA_SOURCE.risks === "live";
+    // A live reply without a risk_id column (for example a Google sign-in page if the
+    // sheet's sharing changes) counts as a failed request: use the backup copy instead.
+    if (isLive && !rows.some(r => "risk_id" in r)) {
+      console.warn('[3CG] Live Risks tab has no "risk_id" column; using the backup copy.');
+      rows = parseCSV(await fetchText(LOCAL_FILES.risks));
+      isLive = false;
+      DATA_STATUS.live--; DATA_STATUS.sample++; DATA_SOURCE.risks = "sample"; updateDataBadge();
+    }
+    if (!rows.some(r => "risk_id" in r)) throw new Error('The risk data has no "risk_id" column.');
   } catch (err) {
     app.innerHTML = `<div class="callout"><strong>The risk data didn't load.</strong>
       <p class="small muted">${esc(err.message)}</p></div>`;
@@ -94,14 +108,17 @@
   const show = v => (v === null || v === undefined ? '<span class="muted">Not scored</span>' : esc(v));
 
   /* ---------- Data source banner ---------- */
-  const source = DATA_SOURCE.risks; // "repo" while risks is listed in REPO_FILES
-  const statusHTML = `
-    <div class="callout callout-info hm-status" data-source="${esc(source)}" role="status">
-      ${source === "repo"
-        ? `<strong>Source: Repository CSV</strong> (<code>data/risks.csv</code>). Changes to that file appear here
-           once they are merged into <code>main</code> and GitHub Pages republishes the site.`
-        : `<strong>Source: ${source === "live" ? "Google Sheet" : "sample file"}.</strong>`}
-    </div>`;
+  const loadedAt = new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  const statusHTML = isLive
+    ? `<div class="callout callout-info hm-status" data-source="live" role="status">
+         <strong>Live data.</strong> Read from the Risks tab of the team's Google Sheet at ${esc(loadedAt)}.
+         Refresh the page after editing the sheet to see the changes.
+       </div>`
+    : `<div class="callout callout-warn hm-status" data-source="backup" role="status">
+         <strong>Backup data.</strong> The team's Google Sheet could not be reached, so this map shows the
+         reviewed ratings saved on ${esc(BACKUP_DATE)} (<code>data/risks.csv</code>).
+         Sheet edits are not shown. Refresh the page to try the live sheet again.
+       </div>`;
 
   const countsHTML = `
     <p class="hm-counts">

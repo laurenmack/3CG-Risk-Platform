@@ -13,11 +13,12 @@
      CHROME_PATH  path to chrome.exe  (default: the installed Chrome)
    Screenshots go to tests/screenshots/ (not committed).
 
-   Section 1 reads the real team Google Sheet and checks that the page
-   matches whatever it holds. Every other section replaces the sheet's
-   reply inside the test browser (usually with the reviewed ratings in
-   data/risks.csv), so the shared sheet is never edited. If the reviewed
-   ratings change, update the expected values in section 2.
+   Section 1 reads the real Risks tab of the PRT-risks Google Sheet and
+   checks that the page matches whatever it holds, so client edits
+   don't break it. Every other section replaces the sheet's reply inside
+   the test browser (usually with the fixed ratings in data/risks.csv),
+   so the real sheet is never edited. If the fixed ratings change,
+   update the expected values in section 2.
    ========================================================== */
 const { chromium } = require("playwright-core");
 const fs = require("fs");
@@ -26,11 +27,13 @@ const path = require("path");
 const BASE = process.env.BASE_URL || "http://127.0.0.1:8765/";
 const SHOTS = path.join(__dirname, "screenshots");
 const RISKS_CSV = path.join(__dirname, "..", "data", "risks.csv");
-// The team's published Google Sheet (Vendor Scorecard + Risks tabs). The Risks tab is gid 593225350.
+// Live risk data: Risks tab (gid 1182985444) of the PRT-risks Google Sheet, via its CSV export link
+const RISKS_SHEET = "https://docs.google.com/spreadsheets/d/1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/";
+const RISKS_GID = "1182985444";
+const RISKS_URL = `${RISKS_SHEET}export?format=csv&gid=${RISKS_GID}`;
+const isRisksSheet = u => String(u).startsWith(RISKS_SHEET) && new URL(u).searchParams.get("gid") === RISKS_GID;
+// The team's published Vendor Scorecard sheet; the heat map uses its Vendors tab for vendor names only
 const TEAM_SHEET_PREFIX = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/";
-const TEAM_RISKS_GID = "593225350";
-const TEAM_RISKS_URL = `${TEAM_SHEET_PREFIX}pub?gid=${TEAM_RISKS_GID}&single=true&output=csv`;
-const isTeamRisks = u => String(u).startsWith(TEAM_SHEET_PREFIX) && new URL(u).searchParams.get("gid") === TEAM_RISKS_GID;
 // Backup date shown on the page, read from js/heatmap.js so the test follows it
 const BACKUP_DATE = (fs.readFileSync(path.join(__dirname, "..", "js", "heatmap.js"), "utf8")
   .match(/BACKUP_DATE = "([^"]+)"/) || [])[1];
@@ -64,8 +67,8 @@ function modified(edits) {
   rows.slice(1).forEach(r => { const e = edits[r[0]]; if (e) Object.entries(e).forEach(([k, v]) => { r[h.indexOf(k)] = v; }); });
   return toCSV(rows);
 }
-// Answer the team sheet's Risks request with the given CSV text (inside the test browser only)
-const serveSheet = (page, body) => page.route(u => isTeamRisks(u.href),
+// Answer the Risks tab request with the given CSV text (inside the test browser only)
+const serveSheet = (page, body) => page.route(u => isRisksSheet(u.href),
   r => r.fulfill({ status: 200, contentType: "text/csv; charset=utf-8", body: typeof body === "function" ? body() : body }));
 
 async function newPage(browser, opts = {}) {
@@ -133,8 +136,8 @@ async function chipsMatchCells(page, grid) {
   try { await fetch(BASE + "index.html"); }
   catch { console.error(`Can't reach ${BASE}. Start the site first: python -m http.server 8765`); await browser.close(); process.exit(2); }
 
-  /* ---------- 1. Real team sheet ---------- */
-  console.log("\n[1] Heat map fetches the team's Google Sheet (real request, no interception)");
+  /* ---------- 1. Real Risks tab ---------- */
+  console.log("\n[1] Heat map fetches the Risks tab of the PRT-risks sheet (real request, no interception)");
   {
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
     const sheetRequests = [], riskResponses = [];
@@ -143,20 +146,23 @@ async function chipsMatchCells(page, grid) {
       if (/docs\.google\.com\/spreadsheets|googleusercontent\.com/.test(req.url())) sheetRequests.push(firstUrl(req));
     });
     page.on("response", res => {
-      if (isTeamRisks(firstUrl(res.request()))) riskResponses.push(`${res.status()} ${res.headers()["content-type"] || ""}`);
+      if (isRisksSheet(firstUrl(res.request())))
+        riskResponses.push(`${res.status()} ${res.headers()["content-type"] || ""} ${new URL(res.url()).host}`);
     });
     await openHeatmapViaNav(page);
     await page.waitForLoadState("networkidle");
     check("URL is heatmap.html after nav click", page.url().endsWith("/heatmap.html"));
-    check("browser requested the team sheet's Risks tab (gid 593225350)", sheetRequests.some(isTeamRisks), JSON.stringify(sheetRequests));
-    check("team Risks CSV arrived (200 text/csv, after Google's redirect)", riskResponses.some(s => s.startsWith("200 text/csv")), JSON.stringify(riskResponses));
-    const other = sheetRequests.filter(u => !u.startsWith(TEAM_SHEET_PREFIX));
-    check("no request to any other Google Sheet", other.length === 0, JSON.stringify(other));
-    check("banner says Live data", await page.$eval(".hm-status", e => e.dataset.source) === "live");
+    check(`browser requested ${RISKS_URL}`, sheetRequests.includes(RISKS_URL), JSON.stringify(sheetRequests));
+    check("Risks CSV arrived (200 text/csv, after Google's redirect)", riskResponses.some(s => s.startsWith("200 text/csv")), JSON.stringify(riskResponses));
+    console.log("     risks responses:", JSON.stringify(riskResponses));
+    const other = sheetRequests.filter(u => !isRisksSheet(u) && !u.startsWith(TEAM_SHEET_PREFIX));
+    check("no request to any other Google Sheet (only the Risks tab and the team's Vendors tab)", other.length === 0, JSON.stringify(other));
+    check("banner says Live data", await page.$eval(".hm-status", e => e.dataset.source) === "live"
+      && (await page.textContent(".hm-status")).includes("Live data"));
     check("footer says Live from Google Sheet", (await page.textContent("#data-source")).trim() === "Live from Google Sheet");
 
     // Compare the page with what the sheet holds right now
-    const live = toObjects(await (await fetch(TEAM_RISKS_URL)).text()).filter(r => r.risk_id);
+    const live = toObjects(await (await fetch(RISKS_URL)).text()).filter(r => r.risk_id);
     const isScored = r => ["likelihood", "impact", "adjusted_likelihood", "risk_score"].every(k => /^\d+$/.test(r[k]));
     const grid = await gridState(page);
     const onMap = grid.flatMap(c => c.ids), waiting = await awaitingIds(page);
@@ -166,14 +172,21 @@ async function chipsMatchCells(page, grid) {
     check("scored rows are on the map; blank rows are under Awaiting scores",
       live.every(r => isScored(r) ? onMap.includes(r.risk_id) : waiting.includes(r.risk_id)));
     check("each plotted risk sits in the cell for its sheet values", await chipsMatchCells(page, grid));
-    console.log(`     team sheet right now: ${onMap.length} plotted, ${waiting.length} awaiting scores`);
-    await page.screenshot({ path: path.join(SHOTS, "1-team-sheet-live.png"), fullPage: true });
+    // For information only (not checked, so client edits can't fail the run): current scores of key risks
+    const now = {};
+    for (const id of ["R1", "R5", "R13", "R11"]) {
+      if (!onMap.includes(id)) { now[id] = "not plotted"; continue; }
+      await page.click(`.hm-grid .hm-chip[data-id="${id}"]`);
+      now[id] = await detailField(page, "risk_score");
+    }
+    console.log(`     sheet right now: ${onMap.length} plotted, ${waiting.length} awaiting scores; scores ${JSON.stringify(now)}`);
+    await page.screenshot({ path: path.join(SHOTS, "1-live-sheet.png"), fullPage: true });
     check("no console/page errors", errors.length === 0, JSON.stringify(errors));
     await ctx.close();
   }
 
-  /* ---------- 2. Reviewed ratings as the sheet's reply ---------- */
-  console.log("\n[2] Team sheet replies with the reviewed ratings (data/risks.csv)");
+  /* ---------- 2. Fixed regression values (fixture as the sheet's reply) ---------- */
+  console.log("\n[2] Fixture: the Risks tab replies with data/risks.csv (fixed regression values)");
   {
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
     await serveSheet(page, FIXTURE);
@@ -292,9 +305,9 @@ async function chipsMatchCells(page, grid) {
 
   /* ---------- 6. Sheet request fails -> backup ---------- */
   for (const mode of ["abort", "http503", "html200"]) {
-    console.log(`\n[6] Team sheet request fails (${mode}) -> Backup data from data/risks.csv`);
+    console.log(`\n[6] Risks tab request fails (${mode}) -> Backup data from data/risks.csv`);
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
-    await page.route(u => isTeamRisks(u.href), r =>
+    await page.route(u => isRisksSheet(u.href), r =>
       mode === "abort" ? r.abort("failed")
       : mode === "http503" ? r.fulfill({ status: 503, body: "unavailable" })
       : r.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><html><body>Sign in to continue</body></html>" }));

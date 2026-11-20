@@ -17,7 +17,10 @@ const SHEET_URLS = {
   scoreReasons: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=618020533&single=true&output=csv",
   weights:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=2023102265&single=true&output=csv",
   tiers:        "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=171082539&single=true&output=csv",
-  risks:        "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=593225350&single=true&output=csv",
+  /* Risks: the Risks tab (gid 1182985444) of the PRT-risks Google Sheet, where the client edits
+     likelihood, impact and notes. Read through its CSV export link (the sheet must stay shared
+     as "Anyone with the link can view"). */
+  risks:        "https://docs.google.com/spreadsheets/d/1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/export?format=csv&gid=1182985444",
   fair: "",
   fairParameters: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=849211233&single=true&output=csv", 
   fairScenarios: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=1793792482&single=true&output=csv", 

@@ -1,0 +1,11 @@
+{
+  "name": "3cg-risk-platform-tests",
+  "private": true,
+  "description": "Browser checks for the 3CG Risk Heat Map. The site itself needs no build or install.",
+  "scripts": {
+    "test": "node heatmap.test.js"
+  },
+  "devDependencies": {
+    "playwright-core": "1.48.2"
+  }
+}

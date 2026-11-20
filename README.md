@@ -92,6 +92,12 @@ Risks tab as CSV (File > Download > CSV), replace `data/risks.csv`, and update `
 **Run it locally.** In this folder, run `python -m http.server 8000` (or `python3 ...`), then open
 `http://localhost:8000` and choose **Risk Heat Map** in the menu. VS Code Live Server works too.
 
+**Run the heat map tests.** These are optional and need Node.js and Google Chrome; the site itself needs no install.
+In one terminal, run `python -m http.server 8765` in this folder. In a second terminal, run `cd tests`, then `npm install`, then `npm test`.
+The script opens the site in headless Chrome. It checks the live map, a phone-sized screen, missing scores, a failed live request (backup data), and an adjusted likelihood of 6.
+The first section reads the real sheet and expects the reviewed values for R1, R4, R5, R11 and R13. If the client re-rates those risks, update the expected values in `tests/heatmap.test.js`.
+Every other section fakes the sheet's reply inside the test browser, so the shared sheet is never changed.
+
 ## Note
 
 Scores and costs are 3CG estimates, not PRT figures. A real deployment would keep vendor ratings private and put the site behind a login.

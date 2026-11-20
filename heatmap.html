@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Open+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/heatmap.css">
 </head>
 <body>
   <div id="site-header"></div>
@@ -21,15 +22,16 @@
     </div>
 
     <section>
-      <!-- ===== RISK HEAT MAP: BUILD INSIDE THIS SECTION ===== -->
-      <div class="slot">
+      <!-- ===== RISK HEAT MAP ===== -->
+      <div class="slot done">
         <div class="slot-head">
           <span class="slot-owner">Owner: <strong>[Name]</strong> · Risk Heat Map</span>
-          <span class="badge status-todo">Not started</span>
+          <span class="badge status-ready">Ready</span>
         </div>
-        <p class="muted small">Reads the Risks tab. Build in js/heatmap.js.</p>
-        <div id="heatmap-app"></div>
-        <div id="heatmap-app-data" class="callout callout-info"></div>
+        <p class="muted small">Click a risk ID to see its details. Scores come from the Risks tab of the Google Sheet.</p>
+        <div id="heatmap-app">
+          <p class="muted">Loading risks…</p>
+        </div>
       </div>
       <!-- ===== END RISK HEAT MAP ===== -->
     </section>

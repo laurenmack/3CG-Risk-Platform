@@ -55,6 +55,43 @@ Don't rename the column headers in the sheet. The code finds data by header name
 
 Browsers block data files when you double-click an HTML file. Use **VS Code > Live Server** (right-click `index.html` and choose Open with Live Server), or run `python3 -m http.server` in this folder and go to `http://localhost:8000`.
 
+## Risk Heat Map
+
+**Which sheet powers it.** The heat map reads the **Risks** tab of the reviewed, scored risk sheet
+([Google Sheet](https://docs.google.com/spreadsheets/d/1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/edit?gid=1182985444#gid=1182985444)),
+through the CSV export link in `SHEET_URLS.risks` in `js/data.js`. It does not use the Risks tab in the team's
+Vendor Scorecard sheet, which still has placeholder values. The sheet has to stay shared as "Anyone with the link
+can view", or the export link stops working and the page falls back to the backup copy.
+
+**What the client updates.** One row per risk, matched by `risk_id` (R1–R13):
+
+| Column | Who fills it | Notes |
+|---|---|---|
+| `likelihood` | Client | Whole number from 1 to 5; higher means more likely |
+| `impact` | Client | Whole number from 1 to 5; higher means more damage |
+| `notes` | Client | Short English reason for the ratings |
+| `adjusted_likelihood` | Formula (gray) | `likelihood + 1` when `vendor_tier` is High. Don't type over it. |
+| `risk_score` | Formula (gray) | `adjusted_likelihood × impact`. Don't type over it. |
+| `vendor_tier` | Typed copy | **A snapshot**, not linked to the Vendor Scorecard. If a vendor's tier changes on the scorecard, change it here by hand. |
+
+Save the sheet, then refresh the website to see the new positions.
+
+**How scores are plotted.**
+- Impact runs left to right (1–5). Adjusted likelihood runs bottom to top (1–6). The sheet's formula has no cap, so a
+  base likelihood of 5 at a High-tier vendor lands in row 6.
+- Each risk ID sits in the cell for its sheet values. The page doesn't recalculate them. Risks that share a cell are all shown.
+- Cell color shows the score band: Low 1–4, Moderate 5–9, High 10–14, Critical 15–30.
+- Click an ID to see its name, category, vendor, base and adjusted likelihood, impact, score, and notes.
+- A row with a blank or invalid `likelihood`, `impact`, `adjusted_likelihood` or `risk_score` isn't plotted.
+  It appears under **Awaiting scores** with the missing fields.
+
+**Live or backup data.** A banner above the map says which one is showing. If the sheet can't be reached, the page
+uses `data/risks.csv`, a verified copy of all 13 scored risks taken on 20 November 2026. To refresh the copy, download the
+Risks tab as CSV (File > Download > CSV), replace `data/risks.csv`, and update `BACKUP_DATE` in `js/heatmap.js`.
+
+**Run it locally.** In this folder, run `python -m http.server 8000` (or `python3 ...`), then open
+`http://localhost:8000` and choose **Risk Heat Map** in the menu. VS Code Live Server works too.
+
 ## Note
 
 Scores and costs are 3CG estimates, not PRT figures. A real deployment would keep vendor ratings private and put the site behind a login.

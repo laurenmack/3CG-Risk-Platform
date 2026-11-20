@@ -1,5 +1,5 @@
 /* ==========================================================
-   heatmap.test.js: browser checks for the Risk Heat Map
+   heatmap.test.js: checks for the Risk Heat Map
    Owner: Yihao Ma
 
    Runs the site in your installed Google Chrome (headless) through
@@ -13,10 +13,12 @@
      CHROME_PATH  path to chrome.exe  (default: the installed Chrome)
    Screenshots go to tests/screenshots/ (not committed).
 
-   Section 1 reads the real Google Sheet and checks the reviewed
-   values (R1/R5/R13, R11, R4). If the client re-rates those risks,
-   update the expected values here. Every other section fakes the
-   sheet's reply in the browser, so the shared sheet is never edited.
+   Section 0 checks data/risks.csv itself: adjusted_likelihood and
+   risk_score must follow the rules in the README.
+   Section 1 loads the real data/risks.csv and checks the reviewed
+   values (R1/R5/R13, R11, R4). If those ratings change, update the
+   expected values here. Sections 3-5 replace the file's contents
+   inside the test browser only; the file on disk is never changed.
    ========================================================== */
 const { chromium } = require("playwright-core");
 const fs = require("fs");
@@ -24,11 +26,11 @@ const path = require("path");
 
 const BASE = process.env.BASE_URL || "http://127.0.0.1:8765/";
 const SHOTS = path.join(__dirname, "screenshots");
-const LOCAL_CSV = path.join(__dirname, "..", "data", "risks.csv");
-const SHEET_PREFIX = "https://docs.google.com/spreadsheets/d/1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/";
-// Backup date shown on the page, read from js/heatmap.js so the test follows it
-const BACKUP_DATE = (fs.readFileSync(path.join(__dirname, "..", "js", "heatmap.js"), "utf8")
-  .match(/BACKUP_DATE = "([^"]+)"/) || [])[1];
+const RISKS_CSV = path.join(__dirname, "..", "data", "risks.csv");
+const RISKS_ROUTE = "**/data/risks.csv";
+// The only Google Sheet the heat map page may contact: the team's published
+// Vendor Scorecard sheet (Vendors tab, used for vendor display names).
+const TEAM_SHEET_PREFIX = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/";
 fs.mkdirSync(SHOTS, { recursive: true });
 
 let failures = 0, passes = 0;
@@ -37,7 +39,7 @@ function check(name, cond, extra = "") {
   else { failures++; console.log(`  FAIL  ${name} ${extra}`); }
 }
 
-// CSV helpers to build modified test data from the local snapshot (never touches the shared sheet)
+// CSV helpers: read data/risks.csv and build modified copies for the browser
 function parse(text) {
   const rows = []; let row = [], cell = "", q = false;
   for (let i = 0; i < text.length; i++) {
@@ -52,11 +54,12 @@ function parse(text) {
 }
 const toCSV = rows => rows.map(r => r.map(c => /[",\n]/.test(c) ? `"${c.replace(/"/g, '""')}"` : c).join(",")).join("\r\n");
 function modified(edits) {
-  const rows = parse(fs.readFileSync(LOCAL_CSV, "utf8"));
+  const rows = parse(fs.readFileSync(RISKS_CSV, "utf8"));
   const h = rows[0];
   rows.slice(1).forEach(r => { const e = edits[r[0]]; if (e) Object.entries(e).forEach(([k, v]) => { r[h.indexOf(k)] = v; }); });
   return toCSV(rows);
 }
+const serve = body => route => route.fulfill({ status: 200, contentType: "text/csv; charset=utf-8", body });
 
 async function newPage(browser, opts = {}) {
   const ctx = await browser.newContext(opts);
@@ -68,10 +71,10 @@ async function newPage(browser, opts = {}) {
 }
 
 // Navigate the way a visitor would: Overview -> header nav "Risk Heat Map"
-async function openHeatmapViaNav(page) {
+async function openHeatmapViaNav(page, waitFor = ".hm-status") {
   await page.goto(BASE + "index.html");
   await page.click('.site-nav a[href="heatmap.html"]');
-  await page.waitForSelector(".hm-status", { timeout: 20000 });
+  await page.waitForSelector(waitFor, { timeout: 20000 });
 }
 
 async function gridState(page) {
@@ -87,6 +90,24 @@ const detailField = (page, f) => page.$eval(`#hm-detail [data-field="${f}"]`, e 
 const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
 
 (async () => {
+  /* ---------- 0. data/risks.csv follows the scoring rules ---------- */
+  console.log("\n[0] data/risks.csv: calculated columns are consistent");
+  {
+    const [header, ...body] = parse(fs.readFileSync(RISKS_CSV, "utf8"));
+    const rows = body.map(r => Object.fromEntries(header.map((k, i) => [k.trim(), (r[i] ?? "").trim()])));
+    const ids = rows.map(r => r.risk_id);
+    check("13 rows, R1–R13 each exactly once", rows.length === 13 && ALL.every(id => ids.filter(x => x === id).length === 1), JSON.stringify(ids));
+    const bad = [];
+    for (const r of rows) {
+      const [lik, imp, adj, score] = ["likelihood", "impact", "adjusted_likelihood", "risk_score"].map(k => r[k] === "" ? null : Number(r[k]));
+      if ([lik, imp, adj, score].includes(null)) continue; // blank rows show under "Awaiting scores"
+      const expAdj = lik + (r.vendor_tier === "High" ? 1 : 0);
+      if (adj !== expAdj) bad.push(`${r.risk_id}: adjusted_likelihood ${adj}, expected ${expAdj}`);
+      if (score !== adj * imp) bad.push(`${r.risk_id}: risk_score ${score}, expected ${adj * imp}`);
+    }
+    check("adjusted_likelihood = likelihood (+1 if High tier) and risk_score = adjusted × impact on every row", bad.length === 0, JSON.stringify(bad));
+  }
+
   const browser = await chromium.launch(process.env.CHROME_PATH
     ? { executablePath: process.env.CHROME_PATH, headless: true }
     : { channel: "chrome", headless: true });
@@ -94,27 +115,31 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
   try { await fetch(BASE + "index.html"); }
   catch { console.error(`Can't reach ${BASE}. Start the site first: python -m http.server 8765`); await browser.close(); process.exit(2); }
 
-  /* ---------- 1. Desktop, real live sheet ---------- */
-  console.log("\n[1] Desktop, live Google Sheet (no interception)");
+  /* ---------- 1. Desktop, repository CSV ---------- */
+  console.log("\n[1] Desktop: heat map reads data/risks.csv from the repository");
   {
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
-    const sheetResponses = [];
-    // The export link answers 307 and redirects to *.googleusercontent.com, which serves the CSV
-    page.on("response", r => {
-      const u = r.url();
-      if (u.startsWith(SHEET_PREFIX) || /sheets\.googleusercontent\.com\/export\/.*1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/.test(u))
-        sheetResponses.push(`${r.status()} ${r.headers()["content-type"] || ""} ${new URL(u).host}`);
+    const csvResponses = [], sheetRequests = [];
+    page.on("response", r => { if (new URL(r.url()).pathname.endsWith("/data/risks.csv")) csvResponses.push(`${r.status()} ${r.url()}`); });
+    page.on("request", req => {
+      if (!/docs\.google\.com\/spreadsheets|googleusercontent\.com/.test(req.url())) return;
+      let first = req; while (first.redirectedFrom()) first = first.redirectedFrom(); // follow redirects back
+      sheetRequests.push({ url: req.url(), origin: first.url() });
     });
     await openHeatmapViaNav(page);
+    await page.waitForLoadState("networkidle");
     check("URL is heatmap.html after nav click", page.url().endsWith("/heatmap.html"));
     check("nav marks Risk Heat Map as current", await page.$eval('.site-nav a[aria-current="page"]', a => a.getAttribute("href")) === "heatmap.html");
-    check("live sheet CSV returned 200 text/csv in the browser (after redirect)",
-      sheetResponses.some(s => s.startsWith("200 text/csv")), JSON.stringify(sheetResponses));
-    console.log("     sheet responses:", JSON.stringify(sheetResponses));
-    check("banner says live data", await page.$eval(".hm-status", e => e.dataset.source) === "live");
-    const banner = await page.textContent(".hm-status");
-    check("banner time is in English (e.g. Nov 20, 2026)", /[A-Z][a-z]{2} \d{1,2}, \d{4}/.test(banner) && !/[　-鿿]/.test(banner), banner.trim());
-    check("footer says live", (await page.textContent("#data-source")).includes("Live from Google Sheet"), await page.textContent("#data-source"));
+    check("browser loaded the repository's data/risks.csv (200)",
+      csvResponses.some(s => s.startsWith("200 ") && s.endsWith(new URL("data/risks.csv", BASE).href)), JSON.stringify(csvResponses));
+    const otherSheets = sheetRequests.filter(s => !s.origin.startsWith(TEAM_SHEET_PREFIX));
+    check("no request to any Google Sheet except the team's Vendor Scorecard tabs (so none to the personal review sheet)",
+      otherSheets.length === 0, JSON.stringify(otherSheets));
+    console.log(`     Google Sheet requests seen: ${sheetRequests.length}, all from the team sheet: ${otherSheets.length === 0}`);
+    check("banner says Repository CSV", await page.$eval(".hm-status", e => e.dataset.source) === "repo"
+      && (await page.textContent(".hm-status")).includes("Repository CSV"));
+    const footer = (await page.textContent("#data-source")).trim();
+    check("footer names the repository CSV", footer.includes("repository CSV") || footer === "Repository CSV", footer);
 
     const grid = await gridState(page);
     const ids = grid.flatMap(c => c.ids);
@@ -151,7 +176,7 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
     check("R1 chip is marked selected", await page.$eval('.hm-grid .hm-chip[data-id="R1"]', b => b.getAttribute("aria-pressed")) === "true");
     check("R1 detail does not say EXAMPLE ROW", !d.includes("EXAMPLE ROW"));
 
-    // Every plotted risk's cell must match its own sheet values
+    // Every plotted risk's cell must match its own values
     let consistent = true;
     for (const c of grid) for (const id of c.ids) {
       await page.click(`.hm-grid .hm-chip[data-id="${id}"]`);
@@ -160,7 +185,7 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
     }
     check("every chip sits in the cell matching its adjusted likelihood, impact and score", consistent);
     await page.click('.hm-grid .hm-chip[data-id="R1"]');
-    await page.screenshot({ path: path.join(SHOTS, "1-desktop-live.png"), fullPage: true });
+    await page.screenshot({ path: path.join(SHOTS, "1-desktop.png"), fullPage: true });
     check("no console/page errors", errors.length === 0, JSON.stringify(errors));
     await ctx.close();
   }
@@ -190,18 +215,17 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
     await ctx.close();
   }
 
-  /* ---------- 3. Live sheet with missing scores (intercepted) ---------- */
-  console.log("\n[3] Live sheet loads but some scores are blank (request intercepted with local test data)");
+  /* ---------- 3. Missing scores (file contents replaced in the browser) ---------- */
+  console.log("\n[3] data/risks.csv has blank or invalid scores");
   {
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
-    const body = modified({
-      R2: { impact: "", risk_score: "" },                                   // impact cleared, formula leaves score blank
+    await page.route(RISKS_ROUTE, serve(modified({
+      R2: { impact: "", risk_score: "" },                                   // impact cleared, score left blank
       R7: { likelihood: "", adjusted_likelihood: "", risk_score: "" },      // likelihood cleared
       R9: { impact: "7", risk_score: "28" }                                 // out-of-range value
-    });
-    await page.route(SHEET_PREFIX + "**", r => r.fulfill({ status: 200, contentType: "text/csv; charset=utf-8", body }));
+    })));
     await openHeatmapViaNav(page);
-    check("banner still says live", await page.$eval(".hm-status", e => e.dataset.source) === "live");
+    check("banner still says Repository CSV", await page.$eval(".hm-status", e => e.dataset.source) === "repo");
     const ids = (await gridState(page)).flatMap(c => c.ids);
     check("10 risks plotted", ids.length === 10, ids.length);
     check("R2, R7, R9 not on the map", !ids.includes("R2") && !ids.includes("R7") && !ids.includes("R9"));
@@ -220,28 +244,20 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
     await ctx.close();
   }
 
-  /* ---------- 4. Live request fails -> backup snapshot ---------- */
-  for (const mode of ["abort", "http503", "html200"]) {
-    console.log(`\n[4] Live sheet request fails (${mode}) -> backup data/risks.csv`);
+  /* ---------- 4. Risk file can't be loaded ---------- */
+  for (const mode of ["http404", "not-csv"]) {
+    console.log(`\n[4] data/risks.csv can't be used (${mode})`);
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
-    await page.route(SHEET_PREFIX + "**", r =>
-      mode === "abort" ? r.abort("failed")
-      : mode === "http503" ? r.fulfill({ status: 503, body: "unavailable" })
-      : r.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><html><body>Sign in to continue</body></html>" }));
-    await openHeatmapViaNav(page);
-    check("banner says backup", await page.$eval(".hm-status", e => e.dataset.source) === "backup");
-    const backupText = await page.textContent(".hm-status");
-    check("banner names the snapshot date and file", !!BACKUP_DATE && backupText.includes(BACKUP_DATE) && backupText.includes("data/risks.csv"), backupText.trim());
-    const grid = await gridState(page);
-    const ids = grid.flatMap(c => c.ids);
-    check("all 13 risks plotted once from backup", ids.length === 13 && ALL.every(id => ids.filter(x => x === id).length === 1));
-    check("R1, R5, R13 share impact 5 / adjusted 4", JSON.stringify(cellAt(grid, 4, 5).ids) === '["R1","R5","R13"]');
-    await page.click('.hm-grid .hm-chip[data-id="R1"]');
-    check("R1 notes shown from backup", (await page.textContent("#hm-detail")).includes("Ransomware has affected PRT"));
-    if (mode === "abort") await page.screenshot({ path: path.join(SHOTS, "4-backup.png"), fullPage: true });
-    // Only the expected fetch warning, no uncaught errors
-    const unexpected = errors.filter(e => !/docs\.google\.com|Failed to load resource|503/.test(e));
-    check("no unexpected console/page errors", unexpected.length === 0, JSON.stringify(errors));
+    await page.route(RISKS_ROUTE, r => mode === "http404"
+      ? r.fulfill({ status: 404, body: "Not found" })
+      : r.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><html><body>Page not found</body></html>" }));
+    await openHeatmapViaNav(page, "#heatmap-app .callout");
+    const msg = (await page.textContent("#heatmap-app")).replace(/\s+/g, " ");
+    check("page says the risk data didn't load", msg.includes("The risk data didn't load"), msg);
+    check("no risk IDs are drawn", (await page.$$(".hm-chip")).length === 0);
+    const pageErrors = errors.filter(e => e.startsWith("pageerror"));
+    check("no uncaught script errors", pageErrors.length === 0, JSON.stringify(pageErrors));
+    if (mode === "http404") await page.screenshot({ path: path.join(SHOTS, "4-file-missing.png"), fullPage: true });
     await ctx.close();
   }
 
@@ -249,8 +265,7 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
   console.log("\n[5] Base likelihood 5 at a High-tier vendor -> adjusted 6");
   {
     const { ctx, page, errors } = await newPage(browser, { viewport: { width: 1280, height: 900 } });
-    const body = modified({ R12: { likelihood: "5", adjusted_likelihood: "6", risk_score: "30" } });
-    await page.route(SHEET_PREFIX + "**", r => r.fulfill({ status: 200, contentType: "text/csv; charset=utf-8", body }));
+    await page.route(RISKS_ROUTE, serve(modified({ R12: { likelihood: "5", adjusted_likelihood: "6", risk_score: "30" } })));
     await openHeatmapViaNav(page);
     const grid = await gridState(page);
     const c65 = cellAt(grid, 6, 5);
@@ -271,10 +286,14 @@ const ALL = Array.from({ length: 13 }, (_, k) => "R" + (k + 1));
     await page.click('.site-nav a[href="scorecard.html"]');
     await page.waitForSelector(".sc-vendor", { timeout: 20000 });
     check("Vendor Scorecard renders vendor cards", (await page.$$(".sc-vendor")).length >= 5);
+    const scFooter = (await page.textContent("#data-source")).trim();
+    check("Vendor Scorecard still reads the live Google Sheet", scFooter === "Live from Google Sheet", scFooter);
     await page.click('.site-nav a[href="fair.html"]');
     await page.waitForLoadState("networkidle");
     const fairText = (await page.textContent("#fair-app")) || "";
     check("FAIR Calculator renders content", fairText.trim().length > 50, fairText.slice(0, 120));
+    const fairFooter = (await page.textContent("#data-source")).trim();
+    check("FAIR Calculator still reads the live Google Sheet", fairFooter === "Live from Google Sheet", fairFooter);
     await page.screenshot({ path: path.join(SHOTS, "6-fair.png"), fullPage: true });
     check("no console/page errors on scorecard/FAIR", errors.length === 0, JSON.stringify(errors));
     await ctx.close();

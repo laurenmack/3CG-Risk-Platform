@@ -17,9 +17,7 @@ const SHEET_URLS = {
   scoreReasons: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=618020533&single=true&output=csv",
   weights:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=2023102265&single=true&output=csv",
   tiers:        "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=171082539&single=true&output=csv",
-  /* Risks: the reviewed, scored risk sheet (Risks tab), read through its CSV export link.
-     The team register's Risks tab (pub?gid=593225350 above) still holds placeholders. */
-  risks:        "https://docs.google.com/spreadsheets/d/1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/export?format=csv&gid=1182985444",
+  // risks: not here. It is read from the repository file in REPO_FILES below.
   fair: "",
   fairParameters: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=849211233&single=true&output=csv", 
   fairScenarios: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=1793792482&single=true&output=csv", 
@@ -34,7 +32,6 @@ const LOCAL_FILES = {
   scoreReasons: "data/score_reasons.csv",
   weights:      "data/weights.csv",
   tiers:        "data/tiers.csv",
-  risks:        "data/risks.csv",
   fair:         "",
   fairParameters: "", 
   fairScenarios: "", 
@@ -42,13 +39,27 @@ const LOCAL_FILES = {
   fairSources: ""
 };
 
-const DATA_STATUS = { live: 0, sample: 0 };
+/* Tables whose real data is a CSV file in this repository, not a Google Sheet.
+   They are read only from that file (no Google request) and shown as "Repository CSV".
+   To change them, edit the file and merge the change; see the README. */
+const REPO_FILES = {
+  risks:        "data/risks.csv"
+};
 
-/* Where each loaded table came from, e.g. DATA_SOURCE.risks === "live" or "sample". */
+const DATA_STATUS = { live: 0, sample: 0, repo: 0 };
+
+/* Where each loaded table came from: "live" (Google Sheet), "sample" (fallback file)
+   or "repo" (repository CSV), e.g. DATA_SOURCE.risks === "repo". */
 const DATA_SOURCE = {};
 
-/* Load one tab by name. Tries the Google Sheet first, then the sample file. */
+/* Load one table by name. A table in REPO_FILES is read from its repository file.
+   Any other table tries the Google Sheet first, then the sample file. */
 async function loadTable(name) {
+  if (REPO_FILES[name]) {
+    const rows = parseCSV(await fetchText(REPO_FILES[name]));
+    DATA_STATUS.repo++; DATA_SOURCE[name] = "repo"; updateDataBadge();
+    return rows;
+  }
   if (!(name in SHEET_URLS)) throw new Error(`No table called "${name}" in data.js`);
   const live = SHEET_URLS[name];
   if (live) {
@@ -122,10 +133,13 @@ function esc(value) {
 /* Footer label showing where the data came from. */
 function updateDataBadge() {
   const el = document.getElementById("data-source");
-  if (!el || DATA_STATUS.live + DATA_STATUS.sample === 0) return;
-  if (DATA_STATUS.sample === 0) { el.textContent = "Live from Google Sheet"; el.dataset.state = "live"; }
-  else if (DATA_STATUS.live === 0) { el.textContent = "Sample data (Google Sheet not linked yet)"; el.dataset.state = "sample"; }
-  else { el.textContent = "Partly live; some tabs using sample data"; el.dataset.state = "mixed"; }
+  const { live, sample, repo } = DATA_STATUS;
+  if (!el || live + sample + repo === 0) return;
+  const plusRepo = repo ? " + repository CSV" : "";
+  if (sample === 0 && live === 0) { el.textContent = "Repository CSV"; el.dataset.state = "live"; }
+  else if (sample === 0) { el.textContent = "Live from Google Sheet" + plusRepo; el.dataset.state = "live"; }
+  else if (live === 0) { el.textContent = "Sample data (Google Sheet not linked yet)" + plusRepo; el.dataset.state = "sample"; }
+  else { el.textContent = "Partly live; some tabs using sample data" + plusRepo; el.dataset.state = "mixed"; }
 }
 
 /* Shows which tables loaded. Handy while building; remove when done. */

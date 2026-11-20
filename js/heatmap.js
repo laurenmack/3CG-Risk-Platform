@@ -1,6 +1,6 @@
 /* ==========================================================
    heatmap.js: Risk Heat Map page
-   Owner: [Name]
+   Owner: Yihao Ma
 
    Reads the Risks tab with loadTable("risks") (link in data.js).
    Each risk is placed by impact (left to right) and adjusted

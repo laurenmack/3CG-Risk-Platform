@@ -12,13 +12,12 @@ const SITE = {
 };
 
 /* Navigation. To add a page: add one line here.
-   soon: true shows a "Soon" tag next to the link. */
+   Optional: soon: true shows a "Soon" tag next to the link. */
 const NAV = [
   { href: "index.html",         label: "Overview" },
   { href: "scorecard.html",     label: "Vendor Scorecard" },
   { href: "heatmap.html",       label: "Risk Heat Map" },
-  { href: "fair.html",          label: "FAIR Calculator" },
-  { href: "vendor-portal.html", label: "Vendor Portal", soon: true }
+  { href: "fair.html",          label: "FAIR Calculator" }
 ];
 
 function renderHeader() {

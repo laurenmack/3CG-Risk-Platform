@@ -1,14 +1,14 @@
 risk_id,risk_name,cia_category,related_vendor_id,vendor_tier,likelihood,impact,adjusted_likelihood,risk_score,notes
-R1,Ransomware at the fare vendor (main scenario),Availability,masabi,High,3,5,4,20,EXAMPLE ROW: likelihood and impact are placeholders for the heat map teammate to replace.
-R2,PRT locked out of the vendor's system,Availability,masabi,High,,,,,
-R3,"Outage that isn't an attack (failed update, cloud outage)",Availability,masabi,High,,,,,
-R4,Repeat of the 2024 attack on PRT's own network,Availability,,,,,,,
-R5,"Theft of rider data (travel history, eligibility records)",Confidentiality,masabi,High,,,,,
-R6,Scam emails and texts pretending to be PRT during the switch,Confidentiality,,,,,,,
-R7,Old ConnectCard data left behind after retirement,Confidentiality,,,,,,,
-R8,Misuse of rider travel data,Confidentiality,masabi,High,,,,,
-R9,Rider accounts taken over with stolen passwords,Integrity,masabi,High,,,,,
-R10,Balances or reduced-fare eligibility altered,Integrity,masabi,High,,,,,
-R11,Fake mobile tickets,Integrity,masabi,High,,,,,
-R12,Fleet-wide changes pushed through the router management platform,Integrity,digi,High,,,,,
-R13,Card data stolen at ticket machines or the processor,Confidentiality,processor,High,,,,,
+R1,Ransomware at the fare vendor (main scenario),Availability,masabi,High,3,5,4,20,"Ransomware has affected PRT, and Masabi reports redundancy. A prolonged vendor incident involving both data theft and service loss could disrupt fare accounts, billing and rider privacy."
+R2,PRT locked out of the vendor’s system,Availability,masabi,High,3,3,4,12,"Vendor-managed access creates a lockout scenario. Losing staff access would delay account support and corrections, while riders could still pay if customer channels remain available."
+R3,"Outage that is not an attack (failed update, cloud outage)",Availability,masabi,High,3,4,4,16,"The transition has produced service limitations, while Masabi reports multi-zone redundancy. A major outage could still interrupt digital purchases and reloads across channels."
+R4,Repeat of the 2024 attack on PRT’s own network,Availability,,,3,4,3,12,"The 2024 incident establishes precedent. Rail disruption was temporary, but some fare-card processing remained unavailable and personal information was taken."
+R5,"Theft of rider data (travel history, eligibility records)",Confidentiality,masabi,High,3,5,4,20,"Encryption reduces exposure, but a breach of linked fare records could reveal travel patterns and eligibility information for many riders."
+R6,Scam emails and texts pretending to be PRT during the switch,Confidentiality,,,3,3,3,9,Real card-replacement notices give impersonators a credible pretext. A successful message could expose a rider’s credentials or money. Local campaign frequency is unverified.
+R7,Old ConnectCard data left behind after retirement,Confidentiality,,,3,4,3,12,"The two card systems overlap before retirement. If identifiable legacy records are retained and exposed, many former cardholders could be affected. Disposal practices need confirmation."
+R8,Misuse of rider travel data,Confidentiality,masabi,High,3,4,4,16,Account-based fares make rider-linked records useful for support. Misuse of authorized access could reveal repeated journeys. Staff access scope needs confirmation.
+R9,Rider accounts taken over with stolen passwords,Integrity,masabi,High,3,3,4,12,A rider login provides access to fare services. Stolen credentials could compromise an individual account and its passes. Local takeover frequency is unknown.
+R10,Balances or reduced-fare eligibility altered,Integrity,masabi,High,3,4,4,16,Migration complicates fare administration. Incorrect balances or eligibility could overcharge riders or prevent discounted travel. Documented pass-loading issues illustrate the consequence.
+R11,Fake mobile tickets,Integrity,masabi,High,2,2,3,6,"Mobile tickets require activation and scanning, making simple counterfeits harder to use. An isolated accepted fake would generally cost a fare."
+R12,Fleet-wide changes pushed through the router management platform,Integrity,digi,High,2,5,3,15,Digi supports group updates. A fleet-wide mistake requires broad management access but could disconnect many vehicles’ fare devices. PRT device grouping needs confirmation.
+R13,Card data stolen at ticket machines or the processor,Confidentiality,processor,High,3,5,4,20,"PRT reports encrypted, PCI-compliant mobile payment storage. Physical terminals and the processor remain separate exposures. A broad processor breach could affect many cardholders."

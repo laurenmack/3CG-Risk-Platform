@@ -1,0 +1,14 @@
+key,value,unit,evidence,source_id,note
+annual_fare_revenue_usd,64761488,USD/year,PUBLIC_NTD,S01,"FY2025 NTD-derived annual fares; agency-wide, not ReadyFare-specific"
+fy2025_boardings,37243400,boardings/year,PUBLIC_NTD,S01,Context only; all modes and payment methods
+audited_fare_revenue_usd,57804984,USD/FY2025,PUBLIC_AUDIT,S02,"Alternative audited accounting basis, not included in base model"
+it_hourly_wage_usd,49.2,USD/hour,PUBLIC_BLS_PROXY,S03,Pittsburgh May 2025 computer and mathematical occupational group mean; not PRT payroll
+support_hourly_wage_usd,23.44,USD/hour,PUBLIC_BLS_PROXY,S03,Pittsburgh May 2025 office and administrative support mean; not PRT payroll
+loaded_labor_multiplier,1.430615,factor,PUBLIC_RATIO_PROXY,S07,"BLS March 2026 civilian workers wages = 69.9% of total comp, 1/0.699. Proxy; not PRT payroll and not project overhead."
+days_per_year,365,days/year,CONSTANT,S05,Calendar-year simple average; holidays/peak-time variation not modeled
+analysis_years,3,years,PROJECT_CHOICE,S05,Undiscounted control cost-benefit horizon
+gsa_it_security_hourly_usd,111.38,USD/hour,PUBLIC_CONTRACT_RATE,S06,"GSA July 2025 year 1 IT Security Analyst 1; procurement comparator, not PRT awarded price"
+gsa_it_software_engineer_hourly_usd,137.6,USD/hour,PUBLIC_CONTRACT_RATE,S06,"GSA July 2025 year 1 IT Software Engineer 2; procurement comparator, not PRT awarded price"
+gsa_blended_incident_rate_usd,117.935,USD/hour,DERIVED_FROM_PUBLIC_RATES_WITH_ASSUMED_MIX,S06,75% security analyst and 25% software engineer; split is synthetic
+ibm_global_breach_avg_2025_usd,4440000,USD/breach,PUBLIC_INDUSTRY_CONTEXT,S08,"Global average not a PRT loss, not used directly in FAIR risk rows"
+bls_march_2026_wage_share,0.699,fraction,PUBLIC_BLS,S07,"Civilian workers wage share, not PRT-specific"

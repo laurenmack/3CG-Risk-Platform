@@ -1,7 +1,7 @@
 /* CSS for FAIR calculator page. */
 .fair-controls { display:grid;grid-template-columns: repeat(auto-fit,minmax(210px,1fr));gap:16px; }
-.fair-controls .field { margin:0; }
-.fair-stat-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0;}
+.fair-controls .field { margin:0; justify-content:flex-end; }
+.fair-stat-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0;}
 .fair-stat-grid .card {padding:16px;}
 .fair-stat-grid .stat-value {font-size: 1.4rem;font-weight: 700;line-height: 1.2;overflow-wrap:anywhere;}
 .fair-panel {margin:18px 0;}

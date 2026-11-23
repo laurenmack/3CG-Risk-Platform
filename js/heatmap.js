@@ -20,14 +20,13 @@
   const BACKUP_DATE = "20 November 2026";
 
   /* Base likelihood and impact are rated 1 to 5. Adjusted likelihood adds 1
-     for High-tier vendors with no cap, so it can reach 6 (a base of 5 at a
-     High-tier vendor). */
+     for High-tier vendors, capped at 5 (the sheet formula is MIN(5, likelihood + 1)). */
   const IMPACTS = [1, 2, 3, 4, 5];
-  const LIKELIHOODS = [6, 5, 4, 3, 2, 1]; // top row first
+  const LIKELIHOODS = [5, 4, 3, 2, 1]; // top row first
 
-  /* Color bands for each cell, by score (adjusted likelihood x impact, 1 to 30). */
+  /* Color bands for each cell, by score (adjusted likelihood x impact, 1 to 25). */
   const BANDS = [
-    { key: "critical", label: "Critical", min: 15, range: "15–30" },
+    { key: "critical", label: "Critical", min: 15, range: "15–25" },
     { key: "high",     label: "High",     min: 10, range: "10–14" },
     { key: "moderate", label: "Moderate", min: 5,  range: "5–9" },
     { key: "low",      label: "Low",      min: 1,  range: "1–4" }
@@ -63,8 +62,8 @@
   const SCORE_FIELDS = [
     { key: "likelihood",          label: "likelihood",          max: 5 },
     { key: "impact",              label: "impact",              max: 5 },
-    { key: "adjusted_likelihood", label: "adjusted likelihood", max: 6 },
-    { key: "risk_score",          label: "risk score",          max: 30 }
+    { key: "adjusted_likelihood", label: "adjusted likelihood", max: 5 },
+    { key: "risk_score",          label: "risk score",          max: 25 }
   ];
 
   const idNumber = id => parseInt(String(id).replace(/\D/g, ""), 10) || 0;
@@ -129,7 +128,7 @@
   /* ---------- Matrix ---------- */
   let gridHTML = "";
   LIKELIHOODS.forEach(l => {
-    gridHTML += `<div class="hm-tick hm-tick-y${l === 6 ? " hm-tick-extra" : ""}" aria-hidden="true">${l}</div>`;
+    gridHTML += `<div class="hm-tick hm-tick-y" aria-hidden="true">${l}</div>`;
     IMPACTS.forEach(i => {
       const here = plotted.filter(r => r.adj === l && r.impact === i);
       const cellScore = l * i;
@@ -153,8 +152,7 @@
         ${BANDS.slice().reverse().map(b => `
           <li><span class="hm-swatch band-${b.key}" aria-hidden="true"></span>${b.label} <span class="muted">${b.range}</span></li>`).join("")}
       </ul>
-      <p class="small muted">A risk tied to a High-tier vendor moves up one likelihood step. The top row (6) can only be
-        reached that way, from a base likelihood of 5.</p>
+      <p class="small muted">A risk tied to a High-tier vendor moves up one likelihood step, up to a maximum of 5.</p>
     </div>`;
 
   /* ---------- Awaiting scores ---------- */
@@ -213,8 +211,9 @@
     let adjNote = "";
     if (r.base !== null && r.adj !== null) {
       const step = r.adj - r.base;
-      adjNote = step === 0 ? "no vendor adjustment"
-        : `${step > 0 ? "+" : ""}${step}${tier ? ` for ${esc(tier)}-tier vendor` : ""}`;
+      adjNote = step !== 0
+        ? `${step > 0 ? "+" : ""}${step}${tier ? ` for ${esc(tier)}-tier vendor` : ""}`
+        : (tier === "High" && r.base === 5 ? "already at the maximum of 5" : "no vendor adjustment");
     }
     const band = r.complete ? bandFor(r.adj * r.impact) : null;
 

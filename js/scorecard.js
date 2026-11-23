@@ -1,6 +1,6 @@
 /* ==========================================================
    scorecard.js: Vendor Scorecard page
-   Owner: [Name]
+   Owner: Lauren Mack
 
    Reads the Vendors, Score_Reasons, Weights and Tiers tabs.
    Scores, weights, tiers and colors all come from the Google Sheet,

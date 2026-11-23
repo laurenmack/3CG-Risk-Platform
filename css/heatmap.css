@@ -4,7 +4,7 @@
    ========================================================== */
 
 /* Score bands: one hue (Carnegie red) that gets stronger as the score rises:
-   pale to deep red on light pages, dull to vivid red on dark pages.
+   pale to deep red on light pages, dark to vivid red on dark pages.
    Each band has a matching text color for the small score in the corner. */
 :root {
   --hm-low: #EE9AA5;      --hm-low-text: #1d1d1f;
@@ -14,10 +14,10 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --hm-low: #73424C;      --hm-low-text: #ffffff;
-    --hm-moderate: #A8364C; --hm-moderate-text: #ffffff;
-    --hm-high: #D42D46;     --hm-high-text: #ffffff;
-    --hm-critical: #FF5C70; --hm-critical-text: #1d1d20;
+    --hm-low: #4A2C32;      --hm-low-text: #ffffff;
+    --hm-moderate: #7C2A38; --hm-moderate-text: #ffffff;
+    --hm-high: #B0172F;     --hm-high-text: #ffffff;
+    --hm-critical: #E5102E; --hm-critical-text: #ffffff;
   }
 }
 .band-low      { --band: var(--hm-low);      --band-text: var(--hm-low-text); }
@@ -52,7 +52,6 @@
 }
 .hm-tick { font-family: var(--mono); font-size: .85rem; color: var(--muted); display: flex; align-items: center; justify-content: center; }
 .hm-tick-x { padding-top: 4px; }
-.hm-tick-extra { font-style: italic; }
 
 .hm-cell {
   position: relative; min-height: 76px; padding: 20px 4px 6px;

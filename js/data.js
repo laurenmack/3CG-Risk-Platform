@@ -9,23 +9,24 @@
    sheet's column headers, e.g. { vendor_id: "masabi", ... }.
    ========================================================== */
 
-/* STEP 1: Paste each published CSV link between the quotes.
-   Google Sheet > File > Share > Publish to web > choose tab > CSV > Publish.
-   Leave a link blank to use the sample file in /data instead. */
-const SHEET_URLS = {
-  vendors:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=819438981&single=true&output=csv",
-  scoreReasons: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=618020533&single=true&output=csv",
-  weights:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=2023102265&single=true&output=csv",
-  tiers:        "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpH9x6fNy3NsFgFoBIHC0NdyyRmUAK89S0yvS0wL42hI7h2H5i-r-6gBDxIN2sNA/pub?gid=171082539&single=true&output=csv",
-  /* Risks: the Risks tab (gid 1182985444) of the PRT-risks Google Sheet, where the client edits
-     likelihood, impact and notes. Read through its CSV export link (the sheet must stay shared
-     as "Anyone with the link can view"). */
-  risks:        "https://docs.google.com/spreadsheets/d/1HSnPp1hhtyK1v07ubjtsOO3oxysZZwbuBkto0xO_Zfc/export?format=csv&gid=1182985444",
-  fairParameters: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=849211233&single=true&output=csv", 
-  fairScenarios: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=1793792482&single=true&output=csv", 
-  fairControls: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=1111731554&single=true&output=csv",
-  fairSources: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLWy_SqgOI1SnY7aeM768A9VqO9M2hWPtE3QaO4Q0YDesqhjvamdbsRWEDSWWLXFBId1MMAW_YlD1/pub?gid=829671258&single=true&output=csv" 
-};
+/* STEP 1: Set PUB to the team sheet's published ID and each tab's gid below.
+   Leave the whole block alone if the sheet hasn't changed. */
+const SHEET_URLS = (() => {
+  // Published ID of the team Google Sheet (File > Share > Publish to web)
+  const PUB = "2PACX-1vTjk_NyHRUsN5vUH789zVEgiv51ax9st3Gxw8X0GuSnQ2W35kf0pqj3nuesqODN-GgO-k6QaT-wbbOu";
+  const tab = gid => `https://docs.google.com/spreadsheets/d/e/${PUB}/pub?gid=${gid}&single=true&output=csv`;
+  return {
+    vendors:        tab("1209982387"),
+    scoreReasons:   tab("1985902459"),
+    weights:        tab("1248099888"),
+    tiers:          tab("2029276056"),
+    risks:          tab("1220176651"),
+    fairParameters: tab("1075413794"),
+    fairScenarios:  tab("614513341"),
+    fairControls:   tab("1125844264"),
+    fairSources:    tab("809246139")
+  };
+})();
 
 /* Sample copies used when a link above is blank or unreachable.
    Set to "" if there's no sample file yet. */

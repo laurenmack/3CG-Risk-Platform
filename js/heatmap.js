@@ -2,7 +2,7 @@
    heatmap.js: Risk Heat Map page
    Owner: Yihao Ma
 
-   Reads the Risks tab of the PRT-risks Google Sheet with loadTable("risks")
+   Reads the Risks tab of the team Google Sheet with loadTable("risks")
    (link in data.js) every time the page opens or is refreshed. If the
    sheet can't be reached, it uses the reviewed copy in data/risks.csv.
    Each risk is placed by impact (left to right) and adjusted likelihood
@@ -109,12 +109,11 @@
   /* ---------- Data source banner ---------- */
   const loadedAt = new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
   const statusHTML = isLive
-    ? `<div class="callout callout-info hm-status" data-source="live" role="status">
-         <strong>Live data.</strong> Read from the Risks tab of the PRT-risks Google Sheet at ${esc(loadedAt)}.
-         Refresh the page after editing the sheet to see the changes.
+    ? `<div class="visually-hidden hm-status" data-source="live" role="status">
+         Live data. Read from the team Google Sheet at ${esc(loadedAt)}.
        </div>`
     : `<div class="callout callout-warn hm-status" data-source="backup" role="status">
-         <strong>Backup data.</strong> The PRT-risks Google Sheet could not be reached, so this map shows the
+         <strong>Backup data.</strong> The team Google Sheet could not be reached, so this map shows the
          reviewed ratings saved on ${esc(BACKUP_DATE)} (<code>data/risks.csv</code>).
          Sheet edits are not shown. Refresh the page to try the live sheet again.
        </div>`;
